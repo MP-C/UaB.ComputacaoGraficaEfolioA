@@ -100,8 +100,8 @@ function createTile(x, y) {
 function drawLine( startPoint, endPoint ) {
     let selectVetor=[];
 
-    selectVetor.push( new THREE.Vector3( startPoint.x * size, startPoint.y * size, 1 ) ); /* Para selecionar os pontos iniciais no vetor*/
-    selectVetor.push( new THREE.Vector3( endPoint.x * size, endPoint.y * size, 1 ) ); /* Para selecionar os pontos finais no vetor */
+    selectVetor.push( new THREE.Vector3( startPoint.x * size, startPoint.y * size, 1/9 ) ); /* Para selecionar os pontos iniciais no vetor*/
+    selectVetor.push( new THREE.Vector3( endPoint.x * size, endPoint.y * size, 1/9 ) ); /* Para selecionar os pontos finais no vetor */
 
     /* Para criar a linha */
     let geometry = new THREE.BufferGeometry().setFromPoints(selectVetor);
@@ -131,32 +131,20 @@ function onWindowResize() {
 /* Para detetar movimentação do rato */
 function onMouseMove(event) {
     event.preventDefault();
-    let movement = {
-        x: mouse.x = ((event.clientX / window.innerWidth) * 2 - 1),
-        y: mouse.y = (-(event.clientY / window.innerHeight) * 2 + 1)
-    }
-
-    // let oldPosition = ({x: mouse.x = 0 , y: mouse.y = 0});  /* Para ter uma posição central e guardar um valor comparativo */
-    // if( oldPosition != movement){ /* Para comparar os valores entre a posição anterior e nova, se forem diferentes, devolve nova coordenada x, e y*/
-    //     let mouseAxis =  "Coordenadas de : X => " + movement.mouse.x + ", Y => " + movement.mouse.y;
-    //     console.log("mouseAxis: ", mouseAxis);
-    //     document.getElementById("mouveAxis").innerHTML = mouseAxis; /* Para afetar a class correspondente no index.html */
-    //     oldPosition = movement; /* Para que a antiga posição troque de valores, pela nova posição alcançada pelo rato */
-    // }
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 }
 
 /* Para detetar seleção de teclas */
 function onDocumentKeyDown(event) {
     /* Para apagar os pontos selecionados e guardados */
     if(event.key === 'Backspace') {
-        console.log("backspace....",selectedPointsMP);
-        
         /* Para apagar os pontos selecionados colecionados, pois já não são precisos */
         selectedPointsMP=[];
 
         scene.remove.apply(scene, scene.children); 
         createDisplayRaster(scene, camera, renderer, controls);
-        renderer.render(scene, camera);   
+        renderer.render(scene, camera);
         controls.update();
 
         console.log("Confirma-se que se apagaou o registo de pontos.");
@@ -175,6 +163,8 @@ function onDocumentKeyDown(event) {
             
             if( selectionColor!=('red')){ /* Caso o pixel não tenha cor vermelha, então muda de cor */
                 selection[0].object.material.color.set(redTile);
+                renderer.render(scene, camera);   
+                controls.update();
             }
 
             let x = selection[0].object.position.x ; /* E impõem-se uma nova posição */
