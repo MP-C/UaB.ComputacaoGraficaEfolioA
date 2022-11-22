@@ -27,7 +27,7 @@ body {
   background-color: #d3d3d3;
 }
 
-.apresentacao {
+.apresentation {
   /* Para ter a posição defenida para o título do projeto no espaço central - identificação */
   display:flex;
   justify-content: space-around;

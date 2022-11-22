@@ -1,2 +1,0 @@
-# UaB.ComputacaoGraficaEfolioA-
-# UaB.ComputacaoGraficaEfolioA

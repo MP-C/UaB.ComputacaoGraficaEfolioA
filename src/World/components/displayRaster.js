@@ -14,7 +14,7 @@ console.log("Check oppening file: displayRastrer.js");
 
 import * as THREE from 'https://unpkg.com/three@0.124.0/build/three.module.js';
 import { createPixel } from './pixel.js';
-import { lineMP } from '../../../../lineMP.mjs'
+import { lineMP } from './../../../lineMP.mjs';
 
 /* Variável para pixel */
 const size = 1; /* Defenir o tamanho do pixel, idêntico ao ladrilho em cima (quando selecionado) */
@@ -110,10 +110,8 @@ function drawLine( startPoint, endPoint ) {
 
     /* Para adicionar a linha à scene */
     scene.add( selectedLine );
-
     selectedPointsMP = selectVetor;
 }
-
 
 
 /* Criação dos eventos que permitem que o utilizador interaja com a interface */
@@ -128,37 +126,40 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth / window.innerHeight);
-    }
+}
 
 /* Para detetar movimentação do rato */
 function onMouseMove(event) {
     event.preventDefault();
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    let movement = {
+        x: mouse.x = ((event.clientX / window.innerWidth) * 2 - 1),
+        y: mouse.y = (-(event.clientY / window.innerHeight) * 2 + 1)
+    }
 
+    // let oldPosition = ({x: mouse.x = 0 , y: mouse.y = 0});  /* Para ter uma posição central e guardar um valor comparativo */
+    // if( oldPosition != movement){ /* Para comparar os valores entre a posição anterior e nova, se forem diferentes, devolve nova coordenada x, e y*/
+    //     let mouseAxis =  "Coordenadas de : X => " + movement.mouse.x + ", Y => " + movement.mouse.y;
+    //     console.log("mouseAxis: ", mouseAxis);
+    //     document.getElementById("mouveAxis").innerHTML = mouseAxis; /* Para afetar a class correspondente no index.html */
+    //     oldPosition = movement; /* Para que a antiga posição troque de valores, pela nova posição alcançada pelo rato */
+    // }
 }
 
 /* Para detetar seleção de teclas */
 function onDocumentKeyDown(event) {
     /* Para apagar os pontos selecionados e guardados */
     if(event.key === 'Backspace') {
-    /* Para apagar os pontos de todos os obejtos */
-    selectedPointsMP=[];
-    tilePointsRed=[];
-    
-    selectedPointsMP.forEach( selectedPoint => scene.remove( selectedPoint ) );
+        console.log("backspace....",selectedPointsMP);
+        
+        /* Para apagar os pontos selecionados colecionados, pois já não são precisos */
+        selectedPointsMP=[];
 
-    // clear objects array since it's no longer needed
-    selectedPointsMP.splice(0, objects.length);
+        scene.remove.apply(scene, scene.children); 
+        createDisplayRaster(scene, camera, renderer, controls);
+        renderer.render(scene, camera);   
+        controls.update();
 
-    // change grid red squares to original color
-    tilePointsRed.forEach( tilePoint => reverseSquaresColor( tileColor ) );
-
-    // clear arrays redSquares and redPoints since they're no longer needed
-    selectedPointsMP.splice( 0, selectedPointsMP.length );
-    tilePointsRed.splice( 0, tilePointsRed.length );
-
-
+        console.log("Confirma-se que se apagaou o registo de pontos.");
     } else if (event.key === 'x') {
 
         let redTile = new THREE.Color('red');
@@ -169,20 +170,20 @@ function onDocumentKeyDown(event) {
         /* Para cruzar os pontos entre o rato e o tabuleiro, quando selecionada a tecla "x" */
         let selection = raycaster.intersectObjects(boards);
         
-        let selectionColor = selection[0].object.material.color;
         if (selection.length > 0) {
+            let selectionColor = selection[0].object.material.color; /* Para selecionar a cor atual e verificar de seguida se o pixel clicado é vermelho */
             
-            if( selectionColor!=('red')){
+            if( selectionColor!=('red')){ /* Caso o pixel não tenha cor vermelha, então muda de cor */
                 selection[0].object.material.color.set(redTile);
-            } 
+            }
 
-            let x = selection[0].object.position.x ;
+            let x = selection[0].object.position.x ; /* E impõem-se uma nova posição */
             let y = selection[0].object.position.y ;
             tilePointsRed.push({x : x, y : y});
 
             if (tilePointsRed.length > 1) {
-                let startPoint = tilePointsRed[0]; /* startPoint igual ao ponto de início de cordenadas do ladrilho vermelho */
-                let endPoint = tilePointsRed[1]; /* endPoint igual ao ponto de final de cordenadas do ladrilho vermelho*/
+                let startPoint = tilePointsRed[0]; /* A variável startPoint igual ao ponto de início de cordenadas do ladrilho vermelho */
+                let endPoint = tilePointsRed[1]; /* A variável endPoint igual ao ponto de final de cordenadas do ladrilho vermelho*/
                 console.log("ponto Inicio ladrilho selecionado: ", startPoint, " e ponto Final ladrilho selecionado: ", endPoint);
 
                 /* Para desenhar a linha */
@@ -195,6 +196,7 @@ function onDocumentKeyDown(event) {
                 tiles.every(tile => scene.add(createTile(tile.x, tile.y)));
                 renderer.render(scene, camera);
                 controls.update();
+                /* Para apagar os pontos vermelhos colecionados, pois não são mais necessários, dado que já foram expostos em Scene */
                 tilePointsRed = [];
             }
         }
