@@ -55,7 +55,7 @@ class World {
   }
 
   render() {
-    controls.update();
+    controls.addEventListener("change", () => renderer.render(scene, camera));
     renderer.render(scene, camera);
   }
 
